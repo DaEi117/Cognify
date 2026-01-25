@@ -1,0 +1,66 @@
+:root {
+    --maxWidth: 520px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    margin: 0;
+    -webkit-text-size-adjust: 100%;
+}
+
+h1, h2, h3, h4 {
+    max-width: var(--maxWidth);
+}
+
+#navigation, #modulListen, #modulAbfrage {
+    max-width: var(--maxWidth);
+}
+
+button {
+    padding: 12px 14px;
+    margin: 6px 6px 6px 0;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: #f7f7f7;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+button:active {
+    transform: scale(0.99);
+}
+
+input, select {
+    display: block;
+    margin-bottom: 10px;
+    padding: 10px;
+    width: 100%;
+    max-width: var(--maxWidth);
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    font-size: 16px; /* wichtig: verhindert iOS-Zoom bei Input-Focus */
+}
+
+li {
+    margin-bottom: 12px;
+}
+
+.statistik {
+    font-size: 0.9em;
+    color: #444;
+    margin: 6px 0;
+}
+
+/* Optional: bessere Lesbarkeit auf kleinen Screens */
+hr {
+    max-width: var(--maxWidth);
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 16px 0;
+}
