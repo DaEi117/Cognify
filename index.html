@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Cognify</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Cognify</h1>
+
+<div id="navigation">
+    <button id="btnListen">Listen verwalten</button>
+    <button id="btnAbfrage">Abfragen</button>
+</div>
+
+<hr>
+
+<!-- ===================== -->
+<!-- Modul 1: Listen -->
+<!-- ===================== -->
+<div id="modulListen">
+
+    <h2>Listen verwalten</h2>
+
+    <h3>Neue Liste anlegen</h3>
+    <input id="listenName" placeholder="Name der Liste" type="text">
+    <input id="feldA" placeholder="Spalte 1" type="text">
+    <input id="feldB" placeholder="Spalte 2" type="text">
+    <button id="listeAnlegen">Liste anlegen</button>
+
+    <h3>Liste aus XLSX importieren</h3>
+    <button id="btnImportXlsx">XLSX importieren (2 Spalten)</button>
+    <input id="fileImportXlsx" type="file" accept=".xlsx,.xls" style="display:none">
+
+    <h3>Export</h3>
+    <button id="btnExportAllJson">Alle Listen exportieren (JSON)</button>
+
+    <h3>Gespeicherte Listen</h3>
+    <ul id="listenUebersicht"></ul>
+
+    <div id="eintragsBereich" style="display:none">
+        <h3 id="aktiveListeTitel"></h3>
+
+        <input id="wertA" type="text">
+        <input id="wertB" type="text">
+        <button id="eintragHinzufuegen">Eintrag hinzufügen</button>
+
+        <h4>Einträge & Statistik</h4>
+        <ul id="eintragsListe"></ul>
+    </div>
+</div>
+
+<!-- ===================== -->
+<!-- Modul 2: Abfrage -->
+<!-- ===================== -->
+<div id="modulAbfrage" style="display:none">
+
+    <h2>Abfragen</h2>
+
+    <label>Liste auswählen:</label>
+    <select id="abfrageListe"></select>
+
+    <label>Karteikasten-System?</label>
+    <select id="karteikastenOption">
+        <option value="nein" selected>Nein</option>
+        <option value="ja">Ja</option>
+    </select>
+
+    <label>Fachauswahl:</label>
+    <select id="fachAuswahl" disabled></select>
+
+    <label>Abfragefolge:</label>
+    <select id="abfrageFolge">
+        <option value="order">Reihenfolge</option>
+        <option value="random">Zufall</option>
+    </select>
+
+    <label>Abfragerichtung:</label>
+    <select id="richtung"></select>
+
+    <label>Anzahl Abfragerunden:</label>
+    <select id="runden">
+        <option value="all">Gesamte Liste</option>
+        <option>10</option><option>20</option><option>30</option>
+        <option>40</option><option>50</option>
+        <option>60</option><option>70</option><option>80</option>
+        <option>90</option><option>100</option>
+    </select>
+
+    <button id="startAbfrage">Abfrage starten</button>
+
+    <hr>
+
+    <div id="abfrageBox" style="display:none">
+        <h3 id="frage"></h3>
+        <p id="loesung" style="display:none"></p>
+
+        <button id="btnPruefen">Prüfen</button>
+
+        <div id="bewertung" style="display:none">
+            <button id="btnRichtig">Richtig</button>
+            <button id="btnFalsch">Falsch</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- SheetJS (XLSX Parser) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script src="app.js"></script>
+</body>
+</html>
