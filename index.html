@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Cognify</title>
+
+    <!-- Mobile / iPhone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- iOS PWA hints -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cognify">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+    <header class="topbar card">
+        <div class="brand">
+            <div class="logo" aria-hidden="true">C</div>
+            <div>
+                <h1 class="title">Cognify</h1>
+                <div class="subtitle">Minimalistisch. Schnell. Fokus.</div>
+            </div>
+        </div>
+
+        <div id="navigation" class="nav">
+            <button id="btnListen" class="btn btn-primary">Listen verwalten</button>
+            <button id="btnAbfrage" class="btn btn-ghost">Abfragen</button>
+        </div>
+    </header>
+
+    <!-- ===================== -->
+    <!-- Modul 1: Listen -->
+    <!-- ===================== -->
+    <section id="modulListen" class="stack">
+
+        <div class="card">
+            <h2 class="h2">Listen verwalten</h2>
+
+            <h3 class="h3">Neue Liste anlegen</h3>
+            <div class="grid">
+                <input id="listenName" placeholder="Name der Liste" type="text">
+                <input id="feldA" placeholder="Spalte 1" type="text">
+                <input id="feldB" placeholder="Spalte 2" type="text">
+            </div>
+            <button id="listeAnlegen" class="btn btn-primary">Liste anlegen</button>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Import</h3>
+            <p class="muted">XLSX mit genau zwei Spalten. Erste Zeile = Header (Spaltennamen).</p>
+            <button id="btnImportXlsx" class="btn btn-ghost">XLSX importieren (2 Spalten)</button>
+            <input id="fileImportXlsx" type="file" accept=".xlsx,.xls" style="display:none">
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Export</h3>
+            <button id="btnExportAllJson" class="btn btn-ghost">Alle Listen exportieren (JSON)</button>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Gespeicherte Listen</h3>
+            <ul id="listenUebersicht" class="list"></ul>
+
+            <div id="eintragsBereich" style="display:none" class="divider-top">
+                <h3 id="aktiveListeTitel" class="h3"></h3>
+
+                <div class="grid">
+                    <input id="wertA" type="text">
+                    <input id="wertB" type="text">
+                </div>
+                <button id="eintragHinzufuegen" class="btn btn-primary">Eintrag hinzufügen</button>
+
+                <h4 class="h4">Einträge & Statistik</h4>
+                <ul id="eintragsListe" class="list"></ul>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ===================== -->
+    <!-- Modul 2: Abfrage -->
+    <!-- ===================== -->
+    <section id="modulAbfrage" style="display:none" class="stack">
+
+        <div class="card">
+            <h2 class="h2">Abfragen</h2>
+
+            <label class="label">Liste auswählen:</label>
+            <select id="abfrageListe"></select>
+
+            <label class="label">Karteikasten-System?</label>
+            <select id="karteikastenOption">
+                <option value="nein" selected>Nein</option>
+                <option value="ja">Ja</option>
+            </select>
+
+            <label class="label">Fachauswahl:</label>
+            <select id="fachAuswahl" disabled></select>
+
+            <label class="label">Abfragefolge:</label>
+            <select id="abfrageFolge">
+                <option value="order">Reihenfolge</option>
+                <option value="random">Zufall</option>
+            </select>
+
+            <label class="label">Abfragerichtung:</label>
+            <select id="richtung"></select>
+
+            <label class="label">Anzahl Abfragerunden:</label>
+            <select id="runden">
+                <option value="all">Gesamte Liste</option>
+                <option>10</option><option>20</option><option>30</option>
+                <option>40</option><option>50</option>
+                <option>60</option><option>70</option><option>80</option>
+                <option>90</option><option>100</option>
+            </select>
+
+            <div class="startRow">
+                <button id="startAbfrage" class="btn btn-primary">Abfrage starten</button>
+                <span id="restAnzeige" class="restAnzeige" aria-live="polite"></span>
+            </div>
+        </div>
+
+        <div id="abfrageBox" style="display:none" class="card quiz">
+            <!-- Bild zur Frage -->
+            <div id="frageBildWrap" class="imgWrap" style="display:none">
+                <img id="frageBild" class="quizImg" alt="Bild zur Frage">
+            </div>
+
+            <h3 id="frage" class="question"></h3>
+
+            <p id="loesung" style="display:none" class="solution"></p>
+
+            <!-- Bild zur Antwort (erst nach Prüfen) -->
+            <div id="antwortBildWrap" class="imgWrap" style="display:none">
+                <img id="antwortBild" class="quizImg" alt="Bild zur Antwort">
+            </div>
+
+            <div class="quizActions">
+                <button id="btnPruefen" class="btn btn-ghost btn-wide">Prüfen</button>
+
+                <div id="bewertung" style="display:none" class="quizActions">
+                    <button id="btnRichtig" class="btn btn-success btn-wide">Richtig</button>
+                    <button id="btnFalsch" class="btn btn-danger btn-wide">Falsch</button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</div>
+
+<!-- SheetJS (XLSX Parser + Export) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!-- Hidden file input for images (per list) -->
+<input id="fileImportImages" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple style="display:none">
+
+<script src="app.js"></script>
+</body>
+</html>
