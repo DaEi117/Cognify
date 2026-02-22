@@ -1,4 +1,4 @@
-const CACHE_NAME = "cognify-v10.0";
+const CACHE_NAME = "cognify-v10";
 const ASSETS = [
   "./",
   "./index.html",
@@ -45,4 +45,5 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(req).catch(() => caches.match(req))
   );
+
 });
