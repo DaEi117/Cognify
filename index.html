@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Cognify</title>
+
+    <!-- Mobile / iPhone -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- iOS PWA hints -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Cognify">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+    <header class="topbar card">
+        <div class="brand">
+            <div class="logo" aria-hidden="true">C</div>
+            <div>
+                <h1 class="title">Cognify V10.0</h1>
+                <div class="subtitle">Minimalistisch. Schnell. Fokus.</div>
+            </div>
+        </div>
+
+        <div id="navigation" class="nav">
+            <button id="btnListen" class="btn btn-primary">Listen verwalten</button>
+            <button id="btnAbfrage" class="btn btn-ghost">Abfragen</button>
+            <button id="btnStatistik" class="btn btn-ghost">Statistik</button>
+
+            <!-- Info Button -->
+            <button id="btnInfo" class="btn btn-ghost infoBtn" type="button" aria-label="Info">i</button>
+        </div>
+    </header>
+
+    <!-- ===================== -->
+    <!-- Modul 1: Listen -->
+    <!-- ===================== -->
+    <section id="modulListen" class="stack">
+
+        <div class="card">
+            <h2 class="h2">Listen verwalten</h2>
+
+            <h3 class="h3">Neue Liste anlegen</h3>
+            <div class="grid">
+                <input id="listenName" placeholder="Name der Liste" type="text">
+                <input id="feldA" placeholder="Spalte 1" type="text">
+                <input id="feldB" placeholder="Spalte 2" type="text">
+            </div>
+            <button id="listeAnlegen" class="btn btn-primary">Liste anlegen</button>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Import</h3>
+            <p class="muted">XLSX mit genau zwei Spalten. Erste Zeile = Header (Spaltennamen).</p>
+            <button id="btnImportXlsx" class="btn btn-ghost">XLSX importieren (2 Spalten)</button>
+            <input id="fileImportXlsx" type="file" accept=".xlsx,.xls" style="display:none">
+
+            <div class="divider-top">
+                <h3 class="h3">KI Generierung</h3>
+                <p class="muted">Erstelle automatisch eine neue Liste mit zwei Spalten (max. 200 Einträge).</p>
+                <button id="btnGenerateXlsx" class="btn btn-primary">XLSX generieren</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Export</h3>
+            <button id="btnExportAllJson" class="btn btn-ghost">Alle Listen exportieren (JSON)</button>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Sortieren</h3>
+            <p class="muted">Sortiert alle Listen alphabetisch (A–Z). Wird gespeichert.</p>
+            <button id="btnSortListenAz" class="btn btn-ghost">Listen A–Z sortieren</button>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Gespeicherte Listen</h3>
+            <ul id="listenUebersicht" class="list"></ul>
+
+            <div id="eintragsBereich" style="display:none" class="divider-top">
+                <h3 id="aktiveListeTitel" class="h3"></h3>
+
+                <div class="grid">
+                    <input id="wertA" type="text">
+                    <input id="wertB" type="text">
+                </div>
+                <button id="eintragHinzufuegen" class="btn btn-primary">Eintrag hinzufügen</button>
+
+                <h4 class="h4">Einträge & Statistik</h4>
+                <ul id="eintragsListe" class="list"></ul>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ===================== -->
+    <!-- Modul 2: Abfrage -->
+    <!-- ===================== -->
+    <section id="modulAbfrage" style="display:none" class="stack">
+
+        <div class="card">
+            <h2 class="h2">Abfragen</h2>
+
+            <label class="label">Liste auswählen:</label>
+            <select id="abfrageListe"></select>
+
+            <label class="label">Karteikasten-System?</label>
+            <select id="karteikastenOption">
+                <option value="nein" selected>Nein</option>
+                <option value="ja">Ja</option>
+            </select>
+
+            <label class="label">Fachauswahl:</label>
+            <select id="fachAuswahl" disabled></select>
+
+            <label class="label">Abfragefolge:</label>
+            <select id="abfrageFolge">
+                <option value="order">Reihenfolge</option>
+                <option value="random">Zufall</option>
+            </select>
+
+            <label class="label">Abfragerichtung:</label>
+            <select id="richtung"></select>
+
+            <label class="label">Anzahl Abfragerunden:</label>
+            <select id="runden">
+                <option value="all">Gesamte Liste</option>
+                <option>10</option><option>20</option><option>30</option>
+                <option>40</option><option>50</option>
+                <option>60</option><option>70</option><option>80</option>
+                <option>90</option><option>100</option>
+            </select>
+
+            <div class="startRow">
+                <button id="startAbfrage" class="btn btn-primary">Abfrage starten</button>
+                <span id="restAnzeige" class="restAnzeige" aria-live="polite"></span>
+            </div>
+        </div>
+
+        <div id="abfrageBox" style="display:none" class="card quiz">
+            <!-- Bild zur Frage -->
+            <div id="frageBildWrap" class="imgWrap" style="display:none">
+                <img id="frageBild" class="quizImg" alt="Bild zur Frage">
+            </div>
+
+            <h3 id="frage" class="question"></h3>
+
+            <p id="loesung" style="display:none" class="solution"></p>
+
+            <!-- Bild zur Antwort (erst nach Prüfen) -->
+            <div id="antwortBildWrap" class="imgWrap" style="display:none">
+                <img id="antwortBild" class="quizImg" alt="Bild zur Antwort">
+            </div>
+
+            <div class="quizActions">
+                <button id="btnPruefen" class="btn btn-ghost btn-wide">Prüfen</button>
+
+                <div id="bewertung" style="display:none" class="quizActions">
+                    <button id="btnRichtig" class="btn btn-success btn-wide">Richtig</button>
+                    <button id="btnFalsch" class="btn btn-danger btn-wide">Falsch</button>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- ===================== -->
+    <!-- Modul 3: Statistik -->
+    <!-- ===================== -->
+    <section id="modulStatistik" style="display:none" class="stack">
+
+        <div class="card">
+            <h2 class="h2">Statistik</h2>
+            <p class="muted">Übersicht über deinen Lernfortschritt, Fachverteilung und Schwachstellen.</p>
+
+            <div class="statGrid">
+                <div class="statCard">
+                    <div class="statLabel">Listen</div>
+                    <div id="statTotalLists" class="statValue">0</div>
+                </div>
+                <div class="statCard">
+                    <div class="statLabel">Einträge gesamt</div>
+                    <div id="statTotalEntries" class="statValue">0</div>
+                </div>
+                <div class="statCard">
+                    <div class="statLabel">Antworten gesamt</div>
+                    <div id="statTotalAnswers" class="statValue">0</div>
+                </div>
+                <div class="statCard">
+                    <div class="statLabel">Quote gesamt</div>
+                    <div id="statTotalQuote" class="statValue">0%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Listenvergleich</h3>
+            <p class="muted">Klicke auf einen Spaltenkopf zum Sortieren.</p>
+
+            <div class="tableWrap">
+                <table class="table" id="listenVergleichTable" aria-label="Listenvergleich">
+                    <thead>
+                        <tr>
+                            <th data-col="name">Liste</th>
+                            <th data-col="entries" class="num">Einträge</th>
+                            <th data-col="answers" class="num">Antworten</th>
+                            <th data-col="correct" class="num">✔</th>
+                            <th data-col="wrong" class="num">✘</th>
+                            <th data-col="quote" class="num">Quote</th>
+                            <th data-col="fach1" class="num">F1</th>
+                            <th data-col="fach2" class="num">F2</th>
+                            <th data-col="fach3" class="num">F3</th>
+                            <th data-col="fach4" class="num">F4</th>
+                            <th data-col="fach5" class="num">F5</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listenVergleichBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Fachverteilung</h3>
+
+            <label class="label">Anzeige:</label>
+            <select id="statListSelect"></select>
+
+            <div class="fachBox">
+                <div class="fachRow">
+                    <div class="fachLabel">Fach 1</div>
+                    <div class="fachBar"><div id="fachBar1" class="fachFill"></div></div>
+                    <div id="fachCount1" class="fachCount">0</div>
+                </div>
+                <div class="fachRow">
+                    <div class="fachLabel">Fach 2</div>
+                    <div class="fachBar"><div id="fachBar2" class="fachFill"></div></div>
+                    <div id="fachCount2" class="fachCount">0</div>
+                </div>
+                <div class="fachRow">
+                    <div class="fachLabel">Fach 3</div>
+                    <div class="fachBar"><div id="fachBar3" class="fachFill"></div></div>
+                    <div id="fachCount3" class="fachCount">0</div>
+                </div>
+                <div class="fachRow">
+                    <div class="fachLabel">Fach 4</div>
+                    <div class="fachBar"><div id="fachBar4" class="fachFill"></div></div>
+                    <div id="fachCount4" class="fachCount">0</div>
+                </div>
+                <div class="fachRow">
+                    <div class="fachLabel">Fach 5</div>
+                    <div class="fachBar"><div id="fachBar5" class="fachFill"></div></div>
+                    <div id="fachCount5" class="fachCount">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="h3">Schwachstellen</h3>
+            <p class="muted">
+                Low Quote: mindestens 5 Antworten &amp; Quote &lt; 60%.<br>
+                Top Fehler-Rate: sortiert nach Fehler-Rate (✘ / (✔+✘)).
+            </p>
+
+            <div class="weakGrid">
+                <div class="weakCol">
+                    <h4 class="h4">Top Fehler-Rate</h4>
+                    <div class="tableWrap">
+                        <table class="table" aria-label="Top Fehler-Rate">
+                            <thead>
+                                <tr>
+                                    <th>Liste</th>
+                                    <th>Eintrag</th>
+                                    <th class="num">Versuche</th>
+                                    <th class="num">✘</th>
+                                    <th class="num">Fehler-Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topErrorRateBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="weakCol">
+                    <h4 class="h4">Low Quote</h4>
+                    <div class="tableWrap">
+                        <table class="table" aria-label="Low Quote">
+                            <thead>
+                                <tr>
+                                    <th>Liste</th>
+                                    <th>Eintrag</th>
+                                    <th class="num">Versuche</th>
+                                    <th class="num">✔</th>
+                                    <th class="num">Quote</th>
+                                </tr>
+                            </thead>
+                            <tbody id="lowQuoteBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- Info Modal -->
+<div id="infoModal" class="modal" aria-hidden="true">
+    <div id="infoBackdrop" class="modalBackdrop"></div>
+
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+        <div class="modalHeader">
+            <h3 id="infoTitle" class="modalTitle">Über Cognify</h3>
+            <button id="btnInfoClose" class="btn btn-ghost modalClose" type="button" aria-label="Schließen">×</button>
+        </div>
+
+        <div class="modalBody">
+            <p><strong>Cognify</strong> ist eine minimalistische Lern-WebApp zur strukturierten Wissenswiederholung.<br>
+            Entwickelt wurde die App von <strong>David Eisel</strong> mit dem Ziel, Lernen klar, fokussiert und effizient zu gestalten – ohne Ablenkung und ohne überladene Oberfläche.</p>
+
+            <p>Die Idee hinter Cognify ist einfach:<br>
+            Wissen soll nicht nur gesammelt, sondern systematisch gefestigt werden.<br>
+            Durch aktives Abfragen, Wiederholen und Analysieren entsteht nachhaltiges Lernen.</p>
+
+            <hr class="modalHr">
+
+            <h4 class="modalH4">📚 Listen verwalten</h4>
+            <p>Im Modul <strong>„Listen verwalten“</strong> erstellst du deine persönlichen Lernlisten.</p>
+            <ul class="modalList">
+                <li>Eigene Listen mit zwei frei definierbaren Spalten anlegen</li>
+                <li>Einträge hinzufügen, bearbeiten oder löschen</li>
+                <li>Listen importieren (XLSX) oder exportieren (JSON, CSV, XLSX)</li>
+                <li>Listen automatisch erstellen lassen</li>
+                <li>Bilder zu Einträgen hinzufügen</li>
+                <li>Einträge nach dem Karteikasten-System strukturieren</li>
+                <li>Listen alphabetisch sortieren</li>
+            </ul>
+            <p>Dieses Modul ist dein persönlicher Wissensspeicher.</p>
+
+            <hr class="modalHr">
+
+            <h4 class="modalH4">🎯 Abfragen</h4>
+            <p>Im Modul <strong>„Abfragen“</strong> wird dein Wissen aktiv getestet.<br>
+            Du kannst zwischen zwei Lernmodi wählen:</p>
+
+            <p><strong>1) Klassische Abfrage</strong><br>
+            Alle Einträge einer Liste werden abgefragt.<br>
+            Du kannst entscheiden, ob:</p>
+            <ul class="modalList">
+                <li>die Abfrage in <strong>Reihenfolge</strong> erfolgt (wie die Liste angelegt wurde),</li>
+                <li>oder im <strong>Zufall</strong> (zufällige Durchmischung).</li>
+            </ul>
+
+            <p>Zusätzlich kannst du wählen:</p>
+            <ul class="modalList">
+                <li><strong>Gesamte Liste</strong> → alle Einträge werden abgefragt</li>
+                <li><strong>Begrenzte Runden</strong> → nur eine festgelegte Anzahl von Einträgen (z. B. 20) wird abgefragt</li>
+            </ul>
+
+            <p>Das eignet sich besonders für gezielte Wiederholungen oder kurze Lerneinheiten.</p>
+
+            <p><strong>2) Karteikasten-System</strong><br>
+            Hier wird nach dem Prinzip des bekannten Lernkastens gearbeitet.</p>
+            <ul class="modalList">
+                <li>Jeder Eintrag befindet sich in einem Fach (1–5).</li>
+                <li>Richtige Antworten lassen den Eintrag ein Fach aufsteigen.</li>
+                <li>Falsche Antworten setzen ihn zurück in Fach 1.</li>
+                <li>Du kannst gezielt einzelne Fächer abfragen.</li>
+            </ul>
+
+            <p>So konzentrierst du dich automatisch stärker auf schwierige Inhalte.</p>
+            <p>Während der Abfrage werden alle Ergebnisse statistisch erfasst.</p>
+
+            <hr class="modalHr">
+
+            <h4 class="modalH4">📊 Statistik</h4>
+            <p>Im Modul <strong>„Statistik“</strong> analysierst du deinen Lernfortschritt.</p>
+            <ul class="modalList">
+                <li>Gesamtübersicht über Listen, Einträge und Erfolgsquote</li>
+                <li>Vergleich aller Listen</li>
+                <li>Fachverteilung im Karteikasten-System</li>
+                <li>Identifikation von Schwachstellen
+                    <ul class="modalListNested">
+                        <li>Höchste Fehler-Raten</li>
+                        <li>Niedrige Erfolgsquoten</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <p>Dieses Modul hilft dir zu erkennen, wo du gut bist – und wo du noch gezielt üben solltest.</p>
+
+            <hr class="modalHr">
+
+            <h4 class="modalH4">Philosophie</h4>
+            <p><strong>Cognify</strong> folgt einem einfachen Prinzip:</p>
+            <p>
+                Klarheit vor Komplexität.<br>
+                Fokus vor Funktionsüberladung.<br>
+                Lernen durch Wiederholung und Reflexion.
+            </p>
+            <p>Alle Daten werden lokal in deinem Browser gespeichert.<br>
+            Für die KI-Generierung werden die eingegebenen Inhalte zur Verarbeitung an einen externen KI-Dienst übertragen.</p>
+        </div>
+    </div>
+</div>
+
+<!-- V10: Generate List Modal -->
+<div id="genModal" class="modal" aria-hidden="true">
+    <div id="genBackdrop" class="modalBackdrop"></div>
+
+    <div class="modalCard" role="dialog" aria-modal="true" aria-labelledby="genTitle">
+        <div class="modalHeader">
+            <h3 id="genTitle" class="modalTitle">XLSX generieren</h3>
+            <button id="btnGenClose" class="btn btn-ghost modalClose" type="button" aria-label="Schließen">×</button>
+        </div>
+
+        <div class="modalBody">
+            <div class="grid">
+                <input id="genListName" type="text" placeholder="Name der Liste (z. B. Biologie – Enzyme)">
+                <input id="genCount" type="number" min="1" max="200" value="30" placeholder="Anzahl Einträge (max 200)">
+                <input id="genColA" type="text" placeholder="Spalte A (z. B. Begriff)">
+                <input id="genColB" type="text" placeholder="Spalte B (z. B. Definition)">
+            </div>
+
+            <label class="label">Schwierigkeit:</label>
+            <select id="genLevel">
+                <option value="easy">Einfach</option>
+                <option value="medium" selected>Mittel</option>
+                <option value="hard">Schwer</option>
+            </select>
+
+            <label class="label">Optionale Anweisungen (max 300 Zeichen):</label>
+            <textarea id="genInstructions" class="textarea" rows="4" placeholder="z. B. Oberstufe, kurze präzise Antworten, keine Duplikate (Standard)"></textarea>
+
+            <p class="muted" style="margin-top:10px">
+                Hinweis: Für die KI-Generierung wird diese Anfrage an einen externen KI-Dienst gesendet.
+            </p>
+
+            <div class="startRow" style="margin-top:14px">
+                <button id="btnGenStart" class="btn btn-primary">Generieren</button>
+                <span id="genStatus" class="restAnzeige" aria-live="polite"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SheetJS (XLSX Parser + Export) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<!-- Hidden file input for images (per list) -->
+<input id="fileImportImages" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple style="display:none">
+
+<script src="app.js"></script>
+</body>
+</html>
